@@ -46,12 +46,12 @@ func (s *Store) Set(key string, response *http.Response, ttl time.Duration) (*Re
     s.mu.Lock()
     defer s.mu.Unlock()
 
+    defer response.Body.Close()
     body, err := io.ReadAll(response.Body)
     if err != nil {
         return nil, fmt.Errorf("failed to read response body: %w", err)
     }
-    defer response.Body.Close()
-
+   
     data := &ResponseData{
         StatusCode: response.StatusCode,
         Headers:    response.Header.Clone(),
@@ -60,4 +60,24 @@ func (s *Store) Set(key string, response *http.Response, ttl time.Duration) (*Re
     }
     s.data[key] = data
     return data, nil
+}
+
+func (s *Store) StartCleanup(interval time.Duration) {
+    go func () {
+        ticker :=  time.NewTicker(interval)
+        defer ticker.Stop()
+        for range ticker.C {
+            s.purgeExpired()
+        }
+    }()
+}
+
+func (s *Store) purgeExpired() {
+    s.mu.Lock()
+    defer s.mu.Unlock()
+    for key, entry := range s.data {
+        if  time.Now().After(entry.ExpiresAt) {
+            delete(s.data,  key)
+        }
+    }
 }

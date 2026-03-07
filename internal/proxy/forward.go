@@ -5,8 +5,9 @@ import (
 	"time"
 )
 
+var httpClient = &http.Client{Timeout: 10 * time.Second}
+
 func ForwardToOriginServer(r *http.Request) (*http.Response, error) {
-	var httpClient = &http.Client{Timeout: 10 * time.Second}
 	resp, err := httpClient.Do(r)
 	if err != nil {
 		return nil, err
