@@ -9,7 +9,13 @@ import (
 )
 
 func main() {
-	port, origin := cli.Flags()
+	port, origin, shouldClear := cli.Flags()
+
+	if shouldClear {
+		proxy.ClearCache()
+		log.Println("Cache cleared successfully")
+		return
+	}
 	err := proxy.StartProxyServer(port, origin)
 	if err != nil {
 		log.Fatalf("Failed to start proxy server: %v", err)

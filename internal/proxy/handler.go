@@ -8,6 +8,7 @@ import (
     "io"
 	"strings"
 	"strconv"
+	"log"
 
 	"github.com/MohOdejimi/ProxyCache/internal/cache"
 
@@ -103,13 +104,17 @@ func directResponseToClient(w http.ResponseWriter, responseData *cache.ResponseD
 	w.Header().Set("X-Cache", cacheStatus)
 	w.WriteHeader(responseData.StatusCode)
 
-	fmt.Println(cacheStatus)
+	log.Println(cacheStatus)
 
 	fmt.Println("Sending response with status:", responseData.StatusCode, "body length:", len(responseData.Body))
 	_, err := w.Write(responseData.Body)
 	if err != nil {
 		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 	}
+}
+
+func ClearCache() {
+	store.Clear()
 }
 
 func ProxyHandler(origin *url.URL) httprouter.Handle {
@@ -165,7 +170,6 @@ func ProxyHandler(origin *url.URL) httprouter.Handle {
                 directResponseToClient(w, responseData, "MISS")
             }
 		} else {
-			fmt.Println("Cache Hit")
 			directResponseToClient(w, cachedResponse, "HIT")
 		}
 	}

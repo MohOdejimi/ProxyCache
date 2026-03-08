@@ -7,11 +7,16 @@ import (
 	"net/url"
 )
 
-func Flags() (int, *url.URL) {
+func Flags() (int, *url.URL, bool) {
 	port := flag.Int("port", 8080, "Port to run the proxy server on")
 	origin := flag.String("origin", "", "Origin server to proxy to")
+	clear := flag.Bool("clear", false, "Clear the cache and exit")
 
 	flag.Parse()
+
+	if *clear {
+		return 0, nil, true
+	}
 
 	if *origin == "" {
 		fmt.Println("Origin server must be specified")
@@ -29,6 +34,6 @@ func Flags() (int, *url.URL) {
 		fmt.Println("Invalid port number")
 		os.Exit(1)
 	}
-	return *port, parsedOrigin
+	return *port, parsedOrigin, *clear
 }
 

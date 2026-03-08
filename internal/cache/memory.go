@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"sync"
 	"time"
-	"fmt"
 )
 
 type ResponseData struct {
@@ -19,8 +18,6 @@ type Store struct {
 	mu    sync.RWMutex
 	data map[string]*ResponseData
 }
-
-// use this constructor when the - cache is cleared or when the application starts up
 
 func NewStore()	*Store {
 	return &Store{
@@ -49,7 +46,7 @@ func (s *Store) Set(key string, response *http.Response, ttl time.Duration) (*Re
     defer response.Body.Close()
     body, err := io.ReadAll(response.Body)
     if err != nil {
-        return nil, fmt.Errorf("failed to read response body: %w", err)
+        return nil, err
     }
    
     data := &ResponseData{
@@ -80,4 +77,10 @@ func (s *Store) purgeExpired() {
             delete(s.data,  key)
         }
     }
+}
+
+func (s *Store) Clear() {
+    s.mu.Lock()
+    defer s.mu.Unlock()
+    s.data = make(map[string]*ResponseData) 
 }
