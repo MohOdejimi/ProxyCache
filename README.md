@@ -26,7 +26,7 @@ A in-memory caching reverse proxy built in Go. ProxyCache sits between clients a
 
 ## ProxyCache
 
-![ProxyCache Architecture](assets/proxycache.png)
+![ProxyCache Architecture](assets/ProxyCache.png)
 
 A in‑memory caching reverse proxy built in Go…
 
@@ -119,4 +119,4 @@ X-Cache: HIT
 |------|-------------|---------|
 | `--port` | Port for the proxy server to listen on | `8080` |
 | `--origin` | URL of the origin server to forward requests to | required |
-| `--clear` | Flush all entries from the cache | — |
+| `--clear` | Flush all entries from the cache | false |
